@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="./js/transform.js"></script>
+    <script src="./js/alloyTouch.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        html,body{
+            margin:0;
+            padding:0;
+        }
+        .carousel {
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+        .nav {
+            position: absolute;
+            bottom: 6px;
+            right: 10px;
+        }
+        .nav a {
+            display: inline-block;
+            background-color: white;
+            cursor: pointer;
+            width: 6px;
+            height: 6px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            border: 1px solid #808080;
+            transition: all .5s ease-in;
+        }
+            .nav a.active {
+                background-color: #ffd800;
+                width: 10px;
+            }
+    .carousel-scroller {
+        position: relative;
+        font-size: 0;
+    }
+
+    
+    </style>
+</head>
+<body>
+	<div id="carousel-container">
+        <div class="carousel">
+            <div style="width: 400%" class="carousel-scroller" id="carousel-scroller">
+                <img style="width: 25%;" src="asset/ci2.jpg">
+                <img style="width: 25%;" src="asset/ci2.jpg">
+                <img style="width: 25%;" src="asset/ci2.jpg">
+                <img style="width: 25%;" src="asset/ci2.jpg">
+            </div>
+            <div class="nav" id="nav">
+                <a data-index="0" class=""></a>
+                <a data-index="1" class=""></a>
+                <a data-index="2" class=""></a>
+                <a data-index="3" class="active"></a>
+            </div>
+        </div>
+    </div>
+<script>
+    /*var flag = true;
+    document.body.addEventListener('click', function(){
+        console.log(flag);
+        var CancelToken = axios.CancelToken;
+        var source = CancelToken.source();
+        if(!flag){
+            source.cancel('多次点击，取消请求');
+        }
+        flag = false;
+        axios.get('https://www.npmjs.com/package/axios',{
+            cancelToken: source.token
+        })
+        .then((data)=>{
+            console.log(data);
+            flag = true;
+        })
+    })*/
+    var items = document.querySelectorAll("#nav a");
+    var scroller = document.querySelector("#carousel-scroller");
+    Transform(scroller); 
+    new AlloyTouch({
+        step: window.innerWidth,
+        touch: "#carousel-container",//反馈触摸的dom
+        vertical: false,// 监听用户横向触摸
+        target: scroller, //运动的对象
+        property: "translateX",  //被运动的属性
+        min:window.innerWidth * -4 + window.innerWidth, 
+        max: 0,
+        touchEnd:function(evt,v,index){
+            // console.log(evt);
+            // console.log(v);
+            debugger
+            var step_v = index * this.step * -1;
+
+            var dx = v - step_v;
+            // dx  >0  向右运动， <0   向左运动
+            console.log('index',index);
+            console.log('step_v',step_v);
+            console.log('v',v);
+            console.log('dx',dx);
+
+            if (v < this.min) {
+                this.to(this.min);
+            } else if (v > this.max) {
+                this.to(this.max);
+            } else if (Math.abs(dx) < 30) {
+                this.to(step_v);
+            }
+            else if (dx > 0) {
+                this.to(step_v + this.step);
+            } else {
+                this.to(step_v - this.step);
+            }
+            return false;
+        },
+        animationEnd: function (evt , v) {
+            var i = 0,
+            len = items.length;
+            for (; i < len; i++) {
+                if (i === this.currentPage) {
+                    items[i].classList.add("active");
+                } else {
+                    items[i].classList.remove("active");
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
